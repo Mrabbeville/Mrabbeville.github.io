@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jutsu Dice Roller</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
+        button { width: 100%; padding: 10px; margin: 5px 0; cursor: pointer; border: none; border-radius: 5px; background: #007bff; color: white; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        #display { font-size: 24px; font-weight: bold; margin: 20px 0; text-align: center; color: #333; }
+        #history { height: 250px; overflow-y: auto; border-top: 2px solid #eee; margin-top: 10px; padding-top: 10px; font-size: 14px; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="display">Select a Roll</div>
+    <div id="buttons"></div>
+    <h3>History</h3>
+    <div id="history"></div>
+</div>
+
+<script>
+    const history = [];
+    const diceConfigs = [
+        {name: "S Rank (D20)", sides: 20, count: 1},
+        {name: "A Rank (D16)", sides: 16, count: 1},
+        {name: "B Rank (D12)", sides: 12, count: 1},
+        {name: "C Rank (D8)", sides: 8, count: 1},
+        {name: "Basic Attack (2d4)", sides: 4, count: 2},
+        {name: "Kenjutsu (D6)", sides: 6, count: 1},
+        {name: "D100", sides: 100, count: 1}
+    ];
+
+    function roll(name, sides, count) {
+        let total = 0;
+        for(let i = 0; i < count; i++) total += Math.floor(Math.random() * sides) + 1;
+        
+        document.getElementById('display').innerText = `${name}: ${total}`;
+        
+        history.unshift(`${name}: ${total}`);
+        if (history.length > 20) history.pop();
+        
+        document.getElementById('history').innerHTML = history.join('<br>');
+    }
+
+    const btnContainer = document.getElementById('buttons');
+    diceConfigs.forEach(d => {
+        let btn = document.createElement('button');
+        btn.innerText = d.name;
+        btn.onclick = () => roll(d.name, d.sides, d.count);
+        btnContainer.appendChild(btn);
+    });
+</script>
+
+</body>
+</html>

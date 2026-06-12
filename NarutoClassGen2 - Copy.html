@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naruto TTRPG Creation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1d;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #252529;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        h1 {
+            margin-top: 0;
+            color: #4CAF50;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .stat-box {
+            background-color: #1a1a1d;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+        .stat-box:hover {
+            border-left-color: #81c784;
+            background-color: #1f1f22;
+        }
+        .stat-title {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            min-height: 1.2em;
+        }
+        
+        /* Nature Styling */
+        #res-natures {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .nature-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+
+        .nature-pip {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            border: 1px solid rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+        }
+        
+        .nature-indicator {
+            color: #4CAF50;
+            margin-left: 6px;
+            font-size: 14px;
+            text-shadow: 0 0 3px rgba(76, 175, 80, 0.5);
+        }
+
+        /* Nature Colors */
+        .pip-fire { background-color: #ff4d4d; box-shadow: 0 0 8px #ff4d4d; }
+        .pip-water { background-color: #3399ff; box-shadow: 0 0 8px #3399ff; }
+        .pip-wind { background-color: #81c784; box-shadow: 0 0 8px #81c784; }
+        .pip-earth { background-color: #a1887f; box-shadow: 0 0 8px #a1887f; }
+        .pip-lightning { background-color: #fdd835; box-shadow: 0 0 8px #fdd835; }
+        .pip-yin { background-color: #424242; border: 1px solid #666; }
+        .pip-yang { background-color: #ffffff; border: 1px solid #ccc; }
+        .pip-yinyang { 
+            background: linear-gradient(135deg, #000000 50%, #ffffff 50%); 
+            border: 1px solid #666;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        button:hover {
+            background: linear-gradient(to bottom, #66BB6A, #43A047);
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+        }
+
+        .bonus-alert {
+            color: #FFD700;
+            font-size: 12px;
+            margin-top: 10px;
+            font-style: italic;
+            text-align: left;
+        }
+        .kg-alert {
+            color: #64B5F6;
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: bold;
+            text-align: left;
+        }
+        .sage-message {
+            color: #ff5252;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 8px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255,82,82,0.5);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Naruto TTRPG Creation</h1>
+        
+        <div class="stat-box">
+            <div class="stat-title">Clan / Village</div>
+            <div class="stat-value" id="res-clan">-</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-title">Specialty</div>
+            <div class="stat-value" id="res-specialty">-</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-title">Proficiency</div>
+            <div class="stat-value" id="res-proficiency">-</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-title">Natures</div>
+            <div class="stat-value" id="res-natures">-</div>
+            <div class="bonus-alert" id="res-bonus"></div>
+        </div>
+
+        <button onclick="generateStats()">Roll Stats</button>
+    </div>
+
+    <script>
+        const clans = [
+            "Ice Release Mist", "Lava Any Village", "Uchiha Leaf", "Puppet Sand", 
+            "Kaguya Mist", "Izuno Leaf", "Yamanaka Leaf", "Kazekage Sand", 
+            "Inuzuka Leaf", "Senju Leaf", "Boil Mist", "Explosion Stone", 
+            "Nara Leaf", "Sarutobi Leaf", "Hozuki Mist", "Scorch Release Sand", 
+            "Hyuga Leaf", "Crystal Any", "Smoke Any", "Jugo Any", 
+            "Hoshigaki Mist", "Storm Clan Cloud", "Akimichi Leaf", 
+            "Aburame Leaf", "Hatake Leaf", "Karatachi Mist", 
+            "Explosion Sand", "Uzumaki Any", "Any Clan Any Village"
+        ];
+
+        const specialties = [
+            "Ninjutsu", "Genjutsu", "Taijutsu", "Prodigy", 
+            "Ninjutsu", "Genjutsu", "Taijutsu"
+        ];
+
+        const proficiencies = [0, 1, 2, 3, 4];
+        
+        const eliteClans = ["Hyuga Leaf", "Senju Leaf", "Uzumaki Any", "Hozuki Mist", "Smoke Any"];
+        const sageEyesClans = ["Senju Leaf", "Uzumaki Any", "Hyuga Leaf", "Uchiha Leaf", "Any Clan Any Village"];
+
+        // Map natures to specific CSS classes for colors
+        const natureClassMap = {
+            "Fire": "pip-fire",
+            "Water": "pip-water",
+            "Wind": "pip-wind",
+            "Earth": "pip-earth",
+            "Lightning": "pip-lightning",
+            "Yin": "pip-yin",
+            "Yang": "pip-yang",
+            "Yin-Yang": "pip-yinyang"
+        };
+
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateStats() {
+            // Roll Clan first to determine if they get special proficiency rules
+            let rolledClan = getRandom(clans);
+            document.getElementById('res-clan').innerText = rolledClan;
+            document.getElementById('res-specialty').innerText = getRandom(specialties);
+
+            // Proficiency Logic: Elite clans cannot roll 0
+            let availableProficiencies = [...proficiencies];
+            if (eliteClans.includes(rolledClan)) {
+                availableProficiencies = availableProficiencies.filter(p => p !== 0);
+            }
+            
+            let rolledProficiency = getRandom(availableProficiencies);
+            document.getElementById('res-proficiency').innerText = rolledProficiency;
+
+            // Kekkei Genkai Forced Nature Identification
+            let forcedNatures = [];
+            let lowerClan = rolledClan.toLowerCase();
+            if (lowerClan.includes("ice release")) forcedNatures = ["Wind", "Water"];
+            else if (lowerClan.includes("lava")) forcedNatures = ["Fire", "Earth"];
+            else if (lowerClan.includes("boil")) forcedNatures = ["Fire", "Water"];
+            else if (lowerClan.includes("scorch")) forcedNatures = ["Fire", "Wind"];
+            else if (lowerClan.includes("kazekage")) forcedNatures = ["Wind", "Earth"];
+            else if (lowerClan.includes("explosion")) forcedNatures = ["Earth", "Lightning"];
+            else if (lowerClan.includes("storm")) forcedNatures = ["Lightning", "Water"];
+
+            // Nature Rolling Logic
+            let standardNatures = ["Water", "Fire", "Earth", "Lightning", "Yin", "Wind", "Yang"];
+            let finalNatures = [];
+            let targetRolls = 2; // Starts with Nature 1 and Nature 2
+            let currentRolls = 0;
+            let bonusCount = 0;
+            let usedKekkeiGenkai = false;
+
+            // Apply Kekkei Genkai Natures if Proficiency is not 0
+            if (forcedNatures.length > 0 && rolledProficiency > 0) {
+                usedKekkeiGenkai = true;
+                finalNatures.push(...forcedNatures);
+                // Remove the forced natures from the available standard pool
+                standardNatures = standardNatures.filter(n => !forcedNatures.includes(n));
+                currentRolls = 2; // The 2 standard slots are consumed by the Kekkei Genkai
+                
+                // Keep the probability fair: simulate the chance of rolling "Bonus nature" 
+                // during those 2 consumed slots (1/8 chance on first roll, 1/7 on second)
+                if (Math.random() < (1/8) && standardNatures.length > 0) {
+                    bonusCount++;
+                    let randIdx = Math.floor(Math.random() * standardNatures.length);
+                    finalNatures.push(standardNatures[randIdx]);
+                    standardNatures.splice(randIdx, 1);
+                }
+                if (Math.random() < (1/7) && standardNatures.length > 0) {
+                    bonusCount++;
+                    let randIdx = Math.floor(Math.random() * standardNatures.length);
+                    finalNatures.push(standardNatures[randIdx]);
+                    standardNatures.splice(randIdx, 1);
+                }
+            }
+
+            // Normal Rolling Loop (Will execute for non-KG, Prof 0 KG, or if Bonus Natures triggered)
+            while (currentRolls < targetRolls) {
+                if (standardNatures.length === 0) break;
+
+                let currentPool = [...standardNatures, "Bonus nature"];
+                let rollIndex = Math.floor(Math.random() * currentPool.length);
+                let rolled = currentPool[rollIndex];
+
+                if (rolled === "Bonus nature") {
+                    bonusCount++;
+                    
+                    let randomNatIndex = Math.floor(Math.random() * standardNatures.length);
+                    let randomNat = standardNatures[randomNatIndex];
+                    
+                    finalNatures.push(randomNat);
+                    standardNatures.splice(randomNatIndex, 1);
+                    // Do NOT increment currentRolls, so it counts as a free Re-roll
+                } else {
+                    finalNatures.push(rolled);
+                    let idx = standardNatures.indexOf(rolled);
+                    standardNatures.splice(idx, 1); 
+                    currentRolls++; 
+                }
+            }
+
+            // Sage Eyes & Body Logic
+            let specialMessage = "";
+            let hasYin = finalNatures.includes("Yin");
+            let hasYang = finalNatures.includes("Yang");
+            let hasAllSeven = finalNatures.length === 7; 
+            let isSageClan = sageEyesClans.includes(rolledClan);
+
+            if (hasAllSeven) {
+                if (isSageClan) {
+                    specialMessage = "You have Awakened the Body & Eyes of the Sage!";
+                } else {
+                    specialMessage = "You have Awakened the Body of the Sage & inherited The Chakra of the Sage!<br>(4x multiplier to Chakra Pool)";
+                }
+                finalNatures = finalNatures.filter(n => n !== "Yin" && n !== "Yang");
+                finalNatures.push("Yin-Yang");
+            } else if (hasYin && hasYang) {
+                if (isSageClan) {
+                    specialMessage = "You've inherited the Eyes of The Sage!";
+                } else {
+                    specialMessage = "You've inherited The Chakra of the Sage!<br>(4x multiplier to Chakra Pool)";
+                }
+                finalNatures = finalNatures.filter(n => n !== "Yin" && n !== "Yang");
+                finalNatures.push("Yin-Yang");
+            }
+
+            // Display Natures with Pips and Indicators
+            const natureResultEl = document.getElementById('res-natures');
+            natureResultEl.innerHTML = ''; 
+
+            finalNatures.forEach(nature => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'nature-wrapper';
+
+                const pip = document.createElement('span');
+                pip.className = `nature-pip ${natureClassMap[nature] || ''}`;
+
+                const text = document.createElement('span');
+                text.innerText = nature;
+
+                const indicator = document.createElement('span');
+                indicator.className = 'nature-indicator';
+                indicator.innerHTML = '&#10004;'; 
+
+                wrapper.appendChild(pip);
+                wrapper.appendChild(text);
+                wrapper.appendChild(indicator);
+                natureResultEl.appendChild(wrapper);
+            });
+            
+            // Display Alerts and Messages
+            const bonusAlertEl = document.getElementById('res-bonus');
+            let alertHTML = "";
+            if (usedKekkeiGenkai) {
+                alertHTML += `<div class="kg-alert">Kekkei Genkai Assigned!</div>`;
+            }
+            if (bonusCount > 0) {
+                alertHTML += `<div class="bonus-alert">(Bonus Nature triggered ${bonusCount} time(s)! granting free random natures & re-rolls)</div>`;
+            }
+            if (specialMessage !== "") {
+                alertHTML += `<span class="sage-message">${specialMessage}</span>`;
+            }
+            
+            bonusAlertEl.innerHTML = alertHTML;
+        }
+    </script>
+</body>
+</html>

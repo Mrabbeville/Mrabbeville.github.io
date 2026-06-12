@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TTRPG EXP Tracker</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .stat { font-size: 1.2em; margin-bottom: 15px; }
+        .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        input { padding: 8px; }
+        .btn-group { display: flex; gap: 10px; }
+        button { padding: 8px; cursor: pointer; }
+        .reset-btn { background-color: #ffcccc; color: #cc0000; border: 1px solid #cc0000; }
+        ul { list-style: none; padding: 0; font-size: 0.9em; }
+        li { border-bottom: 1px solid #eee; padding: 8px 0; display: flex; justify-content: space-between; }
+        .note { color: #666; font-style: italic; }
+        .system { color: #d9534f; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Level: <span id="level">1</span> (<span id="rank">Genin</span>)</h2>
+    <div class="stat">EXP: <span id="currentExp">0</span> / <span id="targetExp">25</span></div>
+    
+    <div class="controls">
+        <input type="number" id="expInput" placeholder="EXP Amount">
+        <input type="text" id="noteInput" placeholder="Reason (e.g., Enemy, Quest)">
+        <div class="btn-group">
+            <button onclick="addExp()">Add EXP</button>
+            <button class="reset-btn" onclick="resetTracker()">Reset Adventure</button>
+        </div>
+    </div>
+
+    <h3>History (Last 15)</h3>
+    <ul id="history"></ul>
+
+    <script>
+        let state = JSON.parse(localStorage.getItem('ttrpgState')) || { level: 1, currentExp: 0, history: [], systemLogs: [] };
+
+        function getTarget(lvl) {
+            let cost = 25 * Math.pow(1.15, lvl - 1);
+            if ([11, 21, 31, 36].includes(lvl)) cost *= 1.5;
+            return Math.floor(cost);
+        }
+
+        function getRank(lvl) {
+            if (lvl <= 10) return "Genin";
+            if (lvl <= 20) return "Chunin";
+            if (lvl <= 30) return "Jounin";
+            if (lvl <= 35) return "Anbu";
+            return "Kage";
+        }
+
+        function addExp() {
+            let gain = parseInt(document.getElementById('expInput').value) || 0;
+            let note = document.getElementById('noteInput').value;
+
+            // Check for Secret Command
+            if (note.startsWith("GMLVLSET=")) {
+                let newLvl = parseInt(note.split('=')[1]);
+                if (!isNaN(newLvl) && newLvl >= 1 && newLvl <= 40) {
+                    state.level = newLvl;
+                    state.currentExp = 0;
+                    state.systemLogs.push(`System: Set to Level ${newLvl}`);
+                }
+            } else {
+                state.history.unshift({ val: gain, note: note || "General EXP" });
+                if (state.history.length > 15) state.history.pop();
+                state.currentExp += gain;
+                
+                // Normal Leveling
+                let target = getTarget(state.level);
+                while (state.currentExp >= target && state.level < 40) {
+                    state.currentExp -= target;
+                    state.level++;
+                    target = getTarget(state.level);
+                }
+            }
+
+            document.getElementById('expInput').value = '';
+            document.getElementById('noteInput').value = '';
+            saveAndUI();
+        }
+
+        function resetTracker() {
+            if (confirm("Are you sure you want to reset your level and history?")) {
+                state = { level: 1, currentExp: 0, history: [], systemLogs: [] };
+                saveAndUI();
+            }
+        }
+
+        function saveAndUI() {
+            localStorage.setItem('ttrpgState', JSON.stringify(state));
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('level').innerText = state.level;
+            document.getElementById('currentExp').innerText = state.currentExp;
+            document.getElementById('targetExp').innerText = getTarget(state.level);
+            document.getElementById('rank').innerText = getRank(state.level);
+            
+            // Build history list: System logs first, then standard history
+            let html = state.systemLogs.map(log => `<li class="system">${log}</li>`).join('');
+            html += state.history.map(item => 
+                `<li><span>${item.val} EXP</span> <span class="note">${item.note}</span></li>`
+            ).join('');
+            document.getElementById('history').innerHTML = html;
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>

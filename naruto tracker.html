@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stat Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        .card {
+            background-color: #313244;
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid #585b70;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #585b70;
+            background-color: #45475a;
+            color: #cdd6f4;
+            box-sizing: border-box;
+        }
+        .multiplier-group {
+            margin-top: auto;
+            border-top: 1px dashed #585b70;
+            padding-top: 15px;
+        }
+        .tracker-panel {
+            margin-top: 20px;
+            background-color: #181825;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .max-stat {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .max-willpower { color: #89b4fa; }
+        .max-health { color: #a6e3a1; }
+        .max-chakra { color: #cba6f7; }
+        
+        .current-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .current-group label {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .current-group input {
+            width: 80px;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Willpower</h2>
+        <div class="input-group">
+            <label>Intelligence</label>
+            <input type="number" id="int" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Awareness</label>
+            <input type="number" id="awa" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Charisma</label>
+            <input type="number" id="cha" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="tracker-panel">
+            <div class="max-stat max-willpower" id="willpower-max">Max Willpower: 0</div>
+            <div class="current-group">
+                <label>Current:</label>
+                <input type="number" id="willpower-curr" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Health</h2>
+        <div class="input-group">
+            <label>Dexterity</label>
+            <input type="number" id="dex" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Stealth</label>
+            <input type="number" id="ste" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Survival</label>
+            <input type="number" id="sur" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group multiplier-group">
+            <label>Health Multiplier</label>
+            <input type="number" id="health-mult" value="1" step="0.1" oninput="calculate()">
+        </div>
+        
+        <div class="tracker-panel">
+            <div class="max-stat max-health" id="health-max">Max Health: 0</div>
+            <div class="current-group">
+                <label>Current:</label>
+                <input type="number" id="health-curr" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Chakra</h2>
+        <div class="input-group">
+            <label>Control</label>
+            <input type="number" id="con" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Potency</label>
+            <input type="number" id="pot" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Flow</label>
+            <input type="number" id="flo" value="0" oninput="calculate()">
+        </div>
+        <div class="input-group multiplier-group">
+            <label>Chakra Multiplier</label>
+            <input type="number" id="chakra-mult" value="1" step="0.1" oninput="calculate()">
+        </div>
+        
+        <div class="tracker-panel">
+            <div class="max-stat max-chakra" id="chakra-max">Max Chakra: 0</div>
+            <div class="current-group">
+                <label>Current:</label>
+                <input type="number" id="chakra-curr" value="0">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Safely reads base stats so blank boxes calculate as 0 instead of breaking the math
+    function getStat(id) {
+        const val = parseFloat(document.getElementById(id).value);
+        return isNaN(val) ? 0 : val;
+    }
+
+    // Safely reads multipliers so blank boxes calculate as 1 (preventing Max from dropping to 0)
+    function getMult(id) {
+        const val = parseFloat(document.getElementById(id).value);
+        return isNaN(val) ? 1 : val;
+    }
+
+    function calculate() {
+        // Willpower
+        const int = getStat('int');
+        const awa = getStat('awa');
+        const cha = getStat('cha');
+        const willpowerBase = Math.ceil((int + awa + cha) / 3);
+        document.getElementById('willpower-max').innerText = 'Max Willpower: ' + willpowerBase;
+
+        // Health
+        const dex = getStat('dex');
+        const ste = getStat('ste');
+        const sur = getStat('sur');
+        const healthMult = getMult('health-mult');
+        const healthBase = Math.ceil((dex + ste + sur) / 3);
+        // Multiply by multiplier, then round up to nearest whole number
+        const healthTotal = Math.ceil(healthBase * healthMult);
+        document.getElementById('health-max').innerText = 'Max Health: ' + healthTotal;
+
+        // Chakra
+        const con = getStat('con');
+        const pot = getStat('pot');
+        const flo = getStat('flo');
+        const chakraMult = getMult('chakra-mult');
+        const chakraBase = Math.ceil((con + pot + flo) / 3);
+        // Multiply by multiplier, then round up to nearest whole number
+        const chakraTotal = Math.ceil(chakraBase * chakraMult);
+        document.getElementById('chakra-max').innerText = 'Max Chakra: ' + chakraTotal;
+    }
+
+    // Runs once immediately so numbers don't sit at 0 until you type
+    calculate();
+</script>
+
+</body>
+</html>

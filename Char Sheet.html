@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shinobi Character Sheet</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.15; max-width: 900px; margin: 20px auto; padding: 20px; background: #f4f4f9; }
+        .section { background: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        input { width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
+        .total { font-weight: bold; color: #d32f2f; }
+    </style>
+</head>
+<body>
+
+    <h1>🌀 Shinobi Character Sheet</h1>
+
+    <div class="section">
+        <label>Name: <input type="text" id="charName" style="width: 200px;"></label>
+        <label>Clan: <input type="text" id="clan"></label>
+    </div>
+
+    <div class="section">
+        <h2>📊 Core Attributes</h2>
+        MIND: <input type="number" id="mind" value="3" oninput="calculate()">
+        BODY: <input type="number" id="body" value="3" oninput="calculate()">
+        SOUL: <input type="number" id="soul" value="4" oninput="calculate()">
+    </div>
+
+    <div class="section">
+        <h2>⚔️ Combat Proficiencies</h2>
+        <table>
+            <tr><th>Skill</th><th>Formula</th><th>Base %</th><th>Bonus</th><th>Final %</th></tr>
+            <tr><td>Ninjutsu</td><td>(S+B)*5</td><td id="ninBase">0</td><td><input type="number" id="ninBonus" class="combat-pts" oninput="calculate()"></td><td id="ninFinal" class="total">0%</td></tr>
+            <tr><td>Genjutsu</td><td>(M+S)*5</td><td id="genBase">0</td><td><input type="number" id="genBonus" class="combat-pts" oninput="calculate()"></td><td id="genFinal" class="total">0%</td></tr>
+            <tr><td>Taijutsu</td><td>(B+M)*5</td><td id="taiBase">0</td><td><input type="number" id="taiBonus" class="combat-pts" oninput="calculate()"></td><td id="taiFinal" class="total">0%</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>🧠 Skills & Specializations</h2>
+        <div class="grid">
+            <div>
+                <b>[MIND]</b><br>
+                Int: <input type="number" id="intPts" oninput="calculate()"> = <span id="intFinal" class="total">0</span>%<br>
+                Awar: <input type="number" id="awarPts" oninput="calculate()"> = <span id="awarFinal" class="total">0</span>%<br>
+                Char: <input type="number" id="charPts" oninput="calculate()"> = <span id="charFinal" class="total">0</span>%
+            </div>
+            <div>
+                <b>[BODY]</b><br>
+                Dex: <input type="number" id="dexPts" oninput="calculate()"> = <span id="dexFinal" class="total">0</span>%<br>
+                Stlh: <input type="number" id="stlhPts" oninput="calculate()"> = <span id="stlhFinal" class="total">0</span>%<br>
+                Surv: <input type="number" id="survPts" oninput="calculate()"> = <span id="survFinal" class="total">0</span>%
+            </div>
+            <div>
+                <b>[SOUL]</b><br>
+                Control: <input type="number" id="ctrlPts" oninput="calculate()"> = <span id="ctrlFinal" class="total">0</span>%<br>
+                Path: <input type="number" id="pathPts" oninput="calculate()"> = <span id="pathFinal" class="total">0</span>%<br>
+                Flow: <input type="number" id="flowPts" oninput="calculate()"> = <span id="flowFinal" class="total">0</span>%
+            </div>
+        </div>
+    </div>
+
+    <button onclick="saveData()" style="padding: 10px 20px;">Save Character Data</button>
+
+    <script>
+        function calculate() {
+            const m = parseInt(document.getElementById('mind').value) || 0;
+            const b = parseInt(document.getElementById('body').value) || 0;
+            const s = parseInt(document.getElementById('soul').value) || 0;
+
+            // Combat Math
+            document.getElementById('ninBase').innerText = (s + b) * 5;
+            document.getElementById('ninFinal').innerText = ((s + b) * 5) + (parseInt(document.getElementById('ninBonus').value) || 0) + "%";
+
+            document.getElementById('genBase').innerText = (m + s) * 5;
+            document.getElementById('genFinal').innerText = ((m + s) * 5) + (parseInt(document.getElementById('genBonus').value) || 0) + "%";
+
+            document.getElementById('taiBase').innerText = (b + m) * 5;
+            document.getElementById('taiFinal').innerText = ((b + m) * 5) + (parseInt(document.getElementById('taiBonus').value) || 0) + "%";
+
+            // Skills Math (Attr * 10) + Pts
+            const skills = [
+                { id: 'int', attr: m }, { id: 'awar', attr: m }, { id: 'char', attr: m },
+                { id: 'dex', attr: b }, { id: 'stlh', attr: b }, { id: 'surv', attr: b },
+                { id: 'ctrl', attr: s }, { id: 'path', attr: s }, { id: 'flow', attr: s }
+            ];
+
+            skills.forEach(skill => {
+                const pts = parseInt(document.getElementById(skill.id + 'Pts').value) || 0;
+                document.getElementById(skill.id + 'Final').innerText = (skill.attr * 10) + pts;
+            });
+        }
+
+        function saveData() {
+            const inputs = document.querySelectorAll('input');
+            const data = {};
+            inputs.forEach(i => data[i.id] = i.value);
+            localStorage.setItem('shinobiData', JSON.stringify(data));
+            alert("Character Data Saved!");
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('shinobiData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                for (let id in data) {
+                    if (document.getElementById(id)) document.getElementById(id).value = data[id];
+                }
+                calculate();
+            }
+        };
+    </script>
+</body>
+</html>
